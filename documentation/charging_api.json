@@ -1,0 +1,93 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Charging Authorization API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1/api/v1/",
+      "description": "local development server"
+    }
+  ],
+  "paths": {
+    "/charging/auth": {
+      "post": {
+        "summary": "Asynchronous auth request",
+        "operationId": "charging_auth_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            },
+            "description": "Bad Request Response"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "station_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Station Identifier"
+          },
+          "driver_id": {
+            "type": "string",
+            "format": "^[\\w-.~]{20,80}$",
+            "title": "Driver identifier"
+          },
+          "callback_url": {
+            "type": "string",
+            "title": "Callback URL",
+            "description": "This URL will be called when the authorization process is completed. No URL checking as per requirements."
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "denied"
+            ],
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        }
+      }
+    }
+  }
+}
