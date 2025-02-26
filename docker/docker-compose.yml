@@ -1,0 +1,6 @@
+services:
+  kafka-cluster:
+    image: apache/kafka:latest
+    container_name: kafka-cluster
+    ports:
+      - "9092:9092"
