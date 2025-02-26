@@ -14,18 +14,21 @@ package at.fcordt.cpauth.apis
 import at.fcordt.cpauth.Paths
 import at.fcordt.cpauth.models.AuthRequest
 import at.fcordt.cpauth.models.AuthResponse
+import at.fcordt.cpauth.services.AuthQueueProvider
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
 fun Route.DefaultApi() {
     val empty = mutableMapOf<String, Any?>()
+    val authQueueProvider by inject<AuthQueueProvider>()
 
     post<Paths.chargingAuthRequestPost> {
         val authRequest = call.receive<AuthRequest>()
-        //insert into queue todo
+        authQueueProvider.insertAuthRequest(authRequest)
         val response = AuthResponse(AuthResponse.Status.accepted, "Request is being processed asynchronously. The result will be sent to the provided callback URL.")
         call.respond(HttpStatusCode.OK,  response);
     }

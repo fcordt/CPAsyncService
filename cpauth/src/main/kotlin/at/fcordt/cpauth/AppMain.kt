@@ -1,6 +1,8 @@
 package at.fcordt.cpauth
 
 import at.fcordt.cpauth.apis.DefaultApi
+import at.fcordt.cpauth.services.AuthQueueProvider
+import at.fcordt.cpauth.services.AuthQueueProviderImpl
 import com.codahale.metrics.Slf4jReporter
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -12,8 +14,20 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.hsts.*
 import io.ktor.server.resources.*
 import io.ktor.server.routing.*
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.singleOf
 import java.util.concurrent.TimeUnit
+import org.koin.dsl.module
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
+
+val appModule = module {
+    //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
+    singleOf(::AuthQueueProviderImpl) {
+        bind<AuthQueueProvider>();
+    }
+}
 
 fun Application.main() {
     install(DefaultHeaders)
@@ -32,6 +46,10 @@ fun Application.main() {
     install(Compression, ApplicationCompressionConfiguration()) // see https://ktor.io/docs/compression.html
     install(HSTS, ApplicationHstsConfiguration()) // see https://ktor.io/docs/hsts.html
     install(Resources)
+    install(Koin) {
+        slf4jLogger()
+        modules(appModule)
+    }
     routing {
         DefaultApi()
     }
