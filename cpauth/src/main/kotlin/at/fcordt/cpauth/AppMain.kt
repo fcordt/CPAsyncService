@@ -4,8 +4,10 @@ import at.fcordt.cpauth.apis.DefaultApi
 import at.fcordt.cpauth.services.AuthQueueProvider
 import at.fcordt.cpauth.services.AuthQueueProviderImpl
 import com.codahale.metrics.Slf4jReporter
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.engine.*
 import io.ktor.server.metrics.dropwizard.*
 import io.ktor.server.plugins.autohead.*
 import io.ktor.server.plugins.compression.*
@@ -21,15 +23,20 @@ import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
-
-val appModule = module {
-    //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
-    singleOf(::AuthQueueProviderImpl) {
-        bind<AuthQueueProvider>();
-    }
-}
-
 fun Application.main() {
+    val appModule = module {
+        //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
+        singleOf(::AuthQueueProviderImpl) {
+            AuthQueueProviderImpl(
+                environment.config.propertyOrNull("kafka.bootstrap_server")?.getString() ?: "localhost:9092",
+                environment.config.propertyOrNull("kafka.topic")?.getString() ?: "cpauth"
+            )
+            bind<AuthQueueProvider>()
+        }
+
+    }
+
+
     install(DefaultHeaders)
     install(DropwizardMetrics) {
         val reporter = Slf4jReporter.forRegistry(registry)
@@ -53,4 +60,5 @@ fun Application.main() {
     routing {
         DefaultApi()
     }
+
 }
