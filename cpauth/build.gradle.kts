@@ -9,9 +9,9 @@ group = "at.fcordt"
 version = "1.0.0"
 
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.1.10"
     application
-    kotlin("plugin.serialization") version "2.0.20"
+    kotlin("plugin.serialization") version "2.1.10"
 }
 
 application {
