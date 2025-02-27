@@ -69,6 +69,14 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) {
                     )
                 )
 
+                HttpStatusCode.RequestTimeout -> setBody(
+                    AuthHookResponse(
+                        value.stationId,
+                        value.driverId,
+                        AuthHookResponse.Status.unknown
+                    )
+                )
+
                 else -> setBody(
                     AuthHookResponse(
                         value.stationId,
