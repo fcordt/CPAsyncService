@@ -24,9 +24,9 @@ fun Application.main() {
         //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
         factory<AuthQueueProvider> {
             AuthQueueProviderImpl(
-                environment.config.propertyOrNull("kafka.bootstrap_server")?.getString() ?: "localhost:9092",
-                environment.config.propertyOrNull("kafka.topic")?.getString() ?: "cpauth",
-                environment.config.propertyOrNull("kafka.insertion_timeout_ms")?.getString()?.toLong() ?: 1000L,
+                environment.config.property("kafka.bootstrap_server").getString(),
+                environment.config.property("kafka.topic").getString(),
+                environment.config.property("kafka.insertion_timeout_ms").getString().toLong(),
             )
         }
     }
