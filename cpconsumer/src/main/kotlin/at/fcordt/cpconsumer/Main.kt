@@ -15,7 +15,7 @@ import io.ktor.serialization.kotlinx.json.*
 
 val client = HttpClient(CIO) {
     install(HttpTimeout) {
-        requestTimeoutMillis = (System.getenv("REQUEST_TIMEOUT").toLongOrNull() ?: 1000L)
+        requestTimeoutMillis = (System.getenv("REQUEST_TIMEOUT")?.toLongOrNull() ?: 1000L)
     }
     install(ContentNegotiation) {
         json()
