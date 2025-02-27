@@ -37,7 +37,7 @@ fun Route.DefaultApi() {
                 "Request is being processed asynchronously. The result will be sent to the provided callback URL."
             ));
         } catch (e: TimeoutException) {
-            call.respond(HttpStatusCode.GatewayTimeout, AuthResponse(
+            call.respond(HttpStatusCode.RequestTimeout, AuthResponse(
                 AuthResponse.Status.denied,
                 "Timeout"
             ));
