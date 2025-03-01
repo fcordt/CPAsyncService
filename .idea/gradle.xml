@@ -17,6 +17,11 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$/cpbackend" />
         <option name="gradleHome" value="" />
         <option name="gradleJvm" value="18" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/cpbackend" />
+          </set>
+        </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/cpconsumer" />
