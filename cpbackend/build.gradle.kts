@@ -3,23 +3,23 @@ val koin_version: String by project
 val ktor_version: String by project
 val kafka_version: String by project
 
-group = "at.fcordt"
-version = "1.0-SNAPSHOT"
-
 plugins {
     kotlin("jvm") version "2.1.10"
     application
     kotlin("plugin.serialization") version "2.1.10"
 }
 
+group = "at.fcordt"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
@@ -38,7 +38,6 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.insert-koin:koin-ktor:$koin_version")
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
-    implementation("org.apache.kafka:kafka-clients:$kafka_version")
 }
 
 kotlin {

@@ -1,4 +1,3 @@
-val kotlin_version: String by project
 val logback_version: String by project
 val kafka_version: String by project
 val ktor_version: String by project
@@ -22,7 +21,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("org.apache.kafka:kafka-clients:$kafka_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
@@ -32,9 +30,6 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
