@@ -11,15 +11,14 @@ interface AuthQueueProvider {
 }
 
 class AuthQueueProviderImpl(bootstrapServer : String, private val topic: String, private val timeOutInMilliSeconds : Long) : AuthQueueProvider {
-    private val settings = mapOf(
+    private val producer = KafkaProducer<String, AuthRequest>(mapOf(
         "bootstrap.servers" to bootstrapServer,
         "key.serializer" to "org.apache.kafka.common.serialization.StringSerializer",
         "value.serializer" to "at.fcordt.cpauth.models.AuthRequestSerializer",
         "security.protocol" to "PLAINTEXT"
-    )
+    ))
 
     override fun insertAuthRequest(authRequest: AuthRequest) {
-        val producer = KafkaProducer<String, AuthRequest>(settings)
         producer.use {
             it.send(ProducerRecord(topic, authRequest)).get(timeOutInMilliSeconds, TimeUnit.MILLISECONDS)
         }

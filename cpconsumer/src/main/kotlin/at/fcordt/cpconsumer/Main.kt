@@ -2,7 +2,9 @@ package at.fcordt.cpconsumer
 
 import at.fcordt.cpconsumer.models.AuthHookResponse
 import at.fcordt.cpconsumer.models.AuthRequest
+import at.fcordt.cpconsumer.models.AuthResponse
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -39,7 +41,7 @@ suspend fun main() {
             val message = it.poll(100.milliseconds.toJavaDuration())
             if(message != null && !message.isEmpty) {
                 for(record in message) {
-                    handleAuthRequest(record.value(), authServerUrl)
+                    handleAuthRequest(record.value(), "$authServerUrl/api/v1/internal/auth")
                 }
             }
         }
@@ -50,6 +52,7 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) {
     //call Auth Server
     if(value.callbackUrl != null) {
         val resp = client.get(requestUrl)
+        val authResponse : AuthResponse = resp.body()
         client.post(value.callbackUrl) {
             contentType(ContentType.Application.Json)
             when (resp.status) {
@@ -57,15 +60,7 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) {
                     AuthHookResponse(
                         value.stationId,
                         value.driverId,
-                        AuthHookResponse.Status.allowed
-                    )
-                )
-
-                HttpStatusCode.Unauthorized -> setBody(
-                    AuthHookResponse(
-                        value.stationId,
-                        value.driverId,
-                        AuthHookResponse.Status.notAllowed
+                        authResponse.status?.toAuthHookStatus()
                     )
                 )
 

@@ -1,8 +1,8 @@
-package at.fcordt.cpauth
+package at.fcordt.cpbackend
 
-import at.fcordt.cpauth.apis.DefaultApi
-import at.fcordt.cpauth.services.AuthQueueProvider
-import at.fcordt.cpauth.services.AuthQueueProviderImpl
+import at.fcordt.cpbackend.apis.DefaultApi
+import at.fcordt.cpbackend.services.AccessControlList
+import at.fcordt.cpbackend.services.InMemoryWhiteList
 import com.codahale.metrics.Slf4jReporter
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -17,16 +17,16 @@ import io.ktor.server.routing.*
 import org.koin.dsl.module
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun Application.main() {
     val appModule = module {
         //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
-        single<AuthQueueProvider> {
-            AuthQueueProviderImpl(
-                environment.config.property("kafka.bootstrap_server").getString(),
-                environment.config.property("kafka.topic").getString(),
-                environment.config.property("kafka.insertion_timeout_ms").getString().toLong(),
+        factory<AccessControlList> {
+            InMemoryWhiteList(
+                environment.config.property("whitelist.allowed_users").getList(),
+                environment.config.property("whitelist.allowed_stations").getList().map { x -> UUID.fromString(x) }
             )
         }
     }

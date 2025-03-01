@@ -1,4 +1,4 @@
-package at.fcordt.cpauth
+package at.fcordt.cpbackend
 
 // Use this file to hold package-level internal functions that return receiver object passed to the `install` method.
 import io.ktor.server.plugins.compression.*
@@ -44,3 +44,4 @@ internal fun ApplicationCompressionConfiguration(): CompressionConfig.() -> Unit
         }
     }
 }
+

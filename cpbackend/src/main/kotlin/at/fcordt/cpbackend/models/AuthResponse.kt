@@ -1,16 +1,14 @@
-package at.fcordt.cpauth.models
+package at.fcordt.cpbackend.models
 
 
 import kotlinx.serialization.Serializable
 /**
  * 
- * @param status 
- * @param message 
+ * @param status
  */
 @Serializable
 data class AuthResponse(
     val status: Status? = null,
-    val message: String? = null
 )
 {
     /**
