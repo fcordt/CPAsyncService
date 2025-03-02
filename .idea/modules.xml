@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/CPAsyncService.iml" filepath="$PROJECT_DIR$/.idea/CPAsyncService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cpauth.iml" filepath="$PROJECT_DIR$/.idea/modules/cpauth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpbackend.iml" filepath="$PROJECT_DIR$/cpbackend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cpconsumer.iml" filepath="$PROJECT_DIR$/cpconsumer.iml" />
     </modules>
   </component>
 </project>
