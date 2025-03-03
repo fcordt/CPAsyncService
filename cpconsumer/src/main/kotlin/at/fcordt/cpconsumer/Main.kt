@@ -3,17 +3,19 @@ package at.fcordt.cpconsumer
 import at.fcordt.cpconsumer.models.AuthHookResponse
 import at.fcordt.cpconsumer.models.AuthRequest
 import at.fcordt.cpconsumer.models.AuthResponse
+import at.fcordt.cpconsumer.services.AuthQueueConsumerImpl
+import at.fcordt.cpconsumer.services.LoginPersistService
+import at.fcordt.cpconsumer.services.LoginPersistServiceImpl
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import org.apache.kafka.clients.consumer.KafkaConsumer
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.toJavaDuration
-import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 val client = HttpClient(CIO) {
     install(HttpTimeout) {
@@ -24,35 +26,28 @@ val client = HttpClient(CIO) {
     }
 }
 
+val queueConsumer = AuthQueueConsumerImpl((System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: "localhost:9092"),
+    System.getenv("KAFKA_TOPIC") ?: "cpauth")
+val persistService : LoginPersistService = LoginPersistServiceImpl()
 
-suspend fun main() {
-    //since it's sutch a small service, don't bother with services, etc...
+
+fun main() {
     val authServerUrl = System.getenv("AUTH_SERVER_URL") ?: "localhost:8084"
-    KafkaConsumer<String, AuthRequest>(mapOf(
-        "bootstrap.servers" to (System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: "localhost:9092"),
-        "auto.offset.reset" to "earliest",
-        "key.deserializer" to "org.apache.kafka.common.serialization.StringDeserializer",
-        "value.deserializer" to "at.fcordt.cpconsumer.models.AuthRequestDeserializer",
-        "group.id" to "consumer_group_1",
-        "security.protocol" to "PLAINTEXT"
-    )).use {
-        it.subscribe(listOf(System.getenv("KAFKA_TOPIC") ?: "cpauth"))
-        while(true) {
-            val message = it.poll(100.milliseconds.toJavaDuration())
-            if(message != null && !message.isEmpty) {
-                for(record in message) {
-                    handleAuthRequest(record.value(), "$authServerUrl/api/v1/internal/auth")
-                }
+    queueConsumer.consume {
+        runBlocking {
+            launch {
+                val resp = handleAuthRequest(it, "$authServerUrl/api/v1/internal/auth")
+                persistService.persisLogin(it, resp)
             }
         }
     }
 }
 
-suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) {
+suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthResponse {
     //call Auth Server
+    val resp = client.get(requestUrl)
+    val authResponse : AuthResponse = resp.body()
     if(value.callbackUrl != null) {
-        val resp = client.get(requestUrl)
-        val authResponse : AuthResponse = resp.body()
         client.post(value.callbackUrl) {
             contentType(ContentType.Application.Json)
             when (resp.status) {
@@ -82,4 +77,5 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) {
             }
         }
     }
+    return authResponse
 }
