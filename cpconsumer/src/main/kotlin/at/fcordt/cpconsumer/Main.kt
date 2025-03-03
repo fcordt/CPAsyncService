@@ -28,7 +28,10 @@ val client = HttpClient(CIO) {
 
 val queueConsumer = AuthQueueConsumerImpl((System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: "localhost:9092"),
     System.getenv("KAFKA_TOPIC") ?: "cpauth")
-val persistService : LoginPersistService = LoginPersistServiceImpl()
+val persistService : LoginPersistService = LoginPersistServiceImpl(
+    (System.getenv("MONGO_DB_CONNECTION_STRING") ?: "mongodb://root:password@mongo:27017/"),
+    (System.getenv("MONGO_DB_NAME") ?: "PersistenceDB"),
+    (System.getenv("MONGO_COLLECTION_NAME") ?: "LoginCollection"))
 
 
 fun main() {
@@ -37,45 +40,25 @@ fun main() {
         runBlocking {
             launch {
                 val resp = handleAuthRequest(it, "$authServerUrl/api/v1/internal/auth")
-                persistService.persisLogin(it, resp)
+                persistService.persistLogin(it, resp)
             }
         }
     }
 }
 
-suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthResponse {
-    //call Auth Server
+suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
     val resp = client.get(requestUrl)
     val authResponse : AuthResponse = resp.body()
+    val status = when (resp.status) {
+        HttpStatusCode.OK -> authResponse.status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
+        HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.unknown
+        else -> AuthHookResponse.Status.invalid
+    }
+    val hookResponse = AuthHookResponse(value.stationId, value.driverId, status)
     if(value.callbackUrl != null) {
         client.post(value.callbackUrl) {
-            contentType(ContentType.Application.Json)
-            when (resp.status) {
-                HttpStatusCode.OK -> setBody(
-                    AuthHookResponse(
-                        value.stationId,
-                        value.driverId,
-                        authResponse.status?.toAuthHookStatus()
-                    )
-                )
-
-                HttpStatusCode.RequestTimeout -> setBody(
-                    AuthHookResponse(
-                        value.stationId,
-                        value.driverId,
-                        AuthHookResponse.Status.unknown
-                    )
-                )
-
-                else -> setBody(
-                    AuthHookResponse(
-                        value.stationId,
-                        value.driverId,
-                        AuthHookResponse.Status.invalid
-                    )
-                )
-            }
+            setBody(hookResponse)
         }
     }
-    return authResponse
+    return hookResponse
 }

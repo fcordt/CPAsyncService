@@ -2,6 +2,8 @@ val logback_version: String by project
 val kafka_version: String by project
 val ktor_version: String by project
 val kotlinx_version: String by project
+val mongo_version: String by project
+val datetime_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -28,6 +30,8 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:$datetime_version")
 }
 
 kotlin {
