@@ -35,11 +35,15 @@ val persistService : LoginPersistService = LoginPersistServiceImpl(
 
 
 fun main() {
-    val authServerUrl = System.getenv("AUTH_SERVER_URL") ?: "localhost:8084"
+    var authServerUrl = (System.getenv("AUTH_SERVER_URL") ?: "localhost:8084") + "/api/v1/internal/auth"
+    if(!authServerUrl.startsWith("http://") && !authServerUrl.startsWith("https://")) {
+        authServerUrl = "http://$authServerUrl"
+    }
+
     queueConsumer.consume {
         runBlocking {
             launch {
-                val resp = handleAuthRequest(it, "$authServerUrl/api/v1/internal/auth")
+                val resp = handleAuthRequest(it, authServerUrl)
                 persistService.persistLogin(it, resp)
             }
         }
@@ -48,9 +52,8 @@ fun main() {
 
 suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
     val resp = client.get(requestUrl)
-    val authResponse : AuthResponse = resp.body()
     val status = when (resp.status) {
-        HttpStatusCode.OK -> authResponse.status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
+        HttpStatusCode.OK -> resp.body<AuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
         HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.unknown
         else -> AuthHookResponse.Status.invalid
     }
@@ -58,6 +61,7 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHook
     if(value.callbackUrl != null) {
         client.post(value.callbackUrl) {
             setBody(hookResponse)
+            contentType(ContentType.Application.Json) //what plugin am I missing to automatically set this?
         }
     }
     return hookResponse

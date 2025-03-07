@@ -29,6 +29,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_version")
