@@ -13,6 +13,17 @@ services:
       - kafka
     networks:
       - cp
+  cpbackend:
+    image: at.fcordt/cpbackend:1.0
+    container_name: cpbackend
+    environment:
+      KTOR_PORT: 8083
+      WHITELIST_USERS: 'long-enough-innit'
+      WHITELIST_STATIONS: '3fa85f64-5717-4562-b3fc-2c963f66afa6,3fa85f64-5717-4562-b3fc-2c963f66afa7'
+    ports:
+      - '8083:8083'
+    networks:
+      - cp
   kafka:
     image: apache/kafka:latest
     container_name: kafka
