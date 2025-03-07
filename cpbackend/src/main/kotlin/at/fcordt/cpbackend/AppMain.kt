@@ -25,8 +25,8 @@ fun Application.main() {
         //for now only a single impl class - maybe later on we want different backend queues, so let's DI it as Interface
         factory<AccessControlList> {
             InMemoryWhiteList(
-                environment.config.property("whitelist.allowed_users").getList(),
-                environment.config.property("whitelist.allowed_stations").getList().map { x -> UUID.fromString(x) }
+                environment.config.property("whitelist.allowed_users").getString().split(','),
+                environment.config.property("whitelist.allowed_stations").getString().split(',').map { x -> UUID.fromString(x) }
             )
         }
     }
