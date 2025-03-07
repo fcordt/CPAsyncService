@@ -4,7 +4,7 @@ val ktor_version: String by project
 val kafka_version: String by project
 
 group = "at.fcordt"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 plugins {
     kotlin("jvm") version "2.1.10"

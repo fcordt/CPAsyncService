@@ -1,4 +1,18 @@
 services:
+  cpauth:
+    image: at.fcordt/cpauth:1.0
+    container_name: cpauth
+    environment:
+      KAFKA_BOOTSTRAP_SERVER: 'kafka:29092'
+      KAFKA_TOPIC: 'cpauth'
+      KAFKA_INSERTION_TIMEOUT: 1000
+      KTOR_PORT: 8082
+    ports:
+      - '8082:8082'
+    depends_on:
+      - kafka
+    networks:
+      - cp
   kafka:
     image: apache/kafka:latest
     container_name: kafka
@@ -15,10 +29,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 1
-    ports:
-      - "8082:8082"
-      - "9092:9092"
-      - "9101:9101"
     networks:
       - cp
   kafka-ui:
@@ -32,6 +42,8 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     volumes:
       - ./data/kui:/etc/kafkaui
+    depends_on:
+      - kafka
     networks:
       - cp
   mongo:
@@ -55,6 +67,8 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo
     networks:
       - cp
 networks:
