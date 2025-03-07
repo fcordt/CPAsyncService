@@ -14,8 +14,10 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.logging.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.net.ConnectException
 
 val client = HttpClient(CIO) {
     install(HttpTimeout) {
@@ -50,6 +52,8 @@ fun main() {
     }
 }
 
+val logger = KtorSimpleLogger("test")
+
 suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
     val resp = client.get(requestUrl)
     val status = when (resp.status) {
@@ -59,10 +63,14 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHook
     }
     val hookResponse = AuthHookResponse(value.stationId, value.driverId, status)
     if(value.callbackUrl != null) {
-        client.post(value.callbackUrl) {
-            setBody(hookResponse)
-            contentType(ContentType.Application.Json) //what plugin am I missing to automatically set this?
-        }
+        logger.info("got response: $hookResponse, calling callback")
+        try {
+            client.post(value.callbackUrl) {
+                setBody(hookResponse)
+                contentType(ContentType.Application.Json) //what plugin am I missing to automatically set this?
+            }
+        } catch (_: ClientRequestException) {}
+        catch (_: ConnectException) {}
     }
     return hookResponse
 }
