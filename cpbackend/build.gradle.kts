@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     application
     kotlin("plugin.serialization") version "2.1.10"
+    id("com.bmuschko.docker-java-application") version "9.4.0"
 }
 
 group = "at.fcordt"
@@ -42,4 +43,11 @@ dependencies {
 
 kotlin {
     jvmToolchain(17)
+}
+
+docker {
+    javaApplication {
+        baseImage.set("bellsoft/liberica-openjdk-alpine:17")
+        mainClassName = application.mainClass
+    }
 }
