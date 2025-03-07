@@ -26,7 +26,7 @@ val client = HttpClient(CIO) {
     }
 }
 
-val queueConsumer = AuthQueueConsumerImpl((System.getenv("KAFKA_BOOTSTRAP_SERVERS") ?: "localhost:9092"),
+val queueConsumer = AuthQueueConsumerImpl((System.getenv("KAFKA_BOOTSTRAP_SERVER") ?: "localhost:9092"),
     System.getenv("KAFKA_TOPIC") ?: "cpauth")
 val persistService : LoginPersistService = LoginPersistServiceImpl(
     (System.getenv("MONGO_DB_CONNECTION_STRING") ?: "mongodb://root:password@mongo:27017/"),

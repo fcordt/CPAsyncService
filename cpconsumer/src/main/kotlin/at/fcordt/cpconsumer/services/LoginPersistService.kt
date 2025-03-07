@@ -12,8 +12,8 @@ interface LoginPersistService {
 }
 
 class LoginPersistServiceImpl(mongoConnectionString : String, databaseName: String, private val mongoCollectionName: String) : LoginPersistService {
-    val client = MongoClient.create(mongoConnectionString)
-    val db = client.getDatabase(databaseName)
+    private val client = MongoClient.create(mongoConnectionString)
+    private val db = client.getDatabase(databaseName)
 
     override suspend fun persistLogin(request: AuthRequest, response: AuthHookResponse) {
         val collection = db.getCollection<PersistenceModel>(mongoCollectionName)

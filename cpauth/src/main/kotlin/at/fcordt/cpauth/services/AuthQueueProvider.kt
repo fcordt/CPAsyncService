@@ -19,8 +19,6 @@ class AuthQueueProviderImpl(bootstrapServer : String, private val topic: String,
     ))
 
     override fun insertAuthRequest(authRequest: AuthRequest) {
-        producer.use {
-            it.send(ProducerRecord(topic, authRequest)).get(timeOutInMilliSeconds, TimeUnit.MILLISECONDS)
-        }
+        producer.send(ProducerRecord(topic, authRequest)).get(timeOutInMilliSeconds, TimeUnit.MILLISECONDS)
     }
 }
