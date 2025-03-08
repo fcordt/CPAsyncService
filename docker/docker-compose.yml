@@ -3,12 +3,12 @@ services:
     image: at.fcordt/cpauth:1.0
     container_name: cpauth
     environment:
-      KAFKA_BOOTSTRAP_SERVER: 'kafka:29092'
+      KAFKA_BOOTSTRAP_SERVER: 'kafka:${KAFKA_LISTENER_PORT}'
       KAFKA_TOPIC: 'cpauth'
       KAFKA_INSERTION_TIMEOUT: 1000
-      KTOR_PORT: 8082
+      KTOR_PORT: ${FRONTEND_PORT}
     ports:
-      - "8082:8082"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     depends_on:
       - kafka
     networks:
@@ -17,7 +17,7 @@ services:
     image: at.fcordt/cpbackend:1.0
     container_name: cpbackend
     environment:
-      KTOR_PORT: 8083
+      KTOR_PORT: ${BACKEND_PORT}
       WHITELIST_USERS: 'long-enough-innit'
       WHITELIST_STATIONS: '3fa85f64-5717-4562-b3fc-2c963f66afa6,3fa85f64-5717-4562-b3fc-2c963f66afa7'
     networks:
@@ -27,12 +27,12 @@ services:
     container_name: cpconsumer
     environment:
       REQUEST_TIMEOUT: 10000
-      KAFKA_BOOTSTRAP_SERVER: 'kafka:29092'
+      KAFKA_BOOTSTRAP_SERVER: 'kafka:${KAFKA_LISTENER_PORT}'
       KAFKA_TOPIC: 'cpauth'
-      MONGO_DB_CONNECTION_STRING: 'mongodb://root:password@mongo:27017/'
+      MONGO_DB_CONNECTION_STRING: 'mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/'
       MONGO_DB_NAME: 'PersistenceDB'
       MONGO_COLLECTION_NAME: 'LoginCollection'
-      AUTH_SERVER_URL: 'cpbackend:8083'
+      AUTH_SERVER_URL: 'cpbackend:${BACKEND_PORT}'
     depends_on:
       - kafka
       - mongo
@@ -45,11 +45,11 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:${KAFKA_LISTENER_PORT}'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
-      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:${KAFKA_LISTENER_PORT},CONTROLLER://kafka:29093'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -61,11 +61,11 @@ services:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "8080:8080"
+      - "${KAFKA_UI_PORT}:${KAFKA_UI_PORT}"
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
       KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:29092'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:${KAFKA_LISTENER_PORT}'
     volumes:
       - ./data/kui:/etc/kafkaui
     depends_on:
@@ -77,8 +77,8 @@ services:
     container_name: mongo
     hostname: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     volumes:
       - ./data/mongo/data:/data/db
     networks:
@@ -87,11 +87,11 @@ services:
     image: mongo-express
     container_name: mongo-express
     ports:
-      - "8081:8081"
+      - "${MONGO_EXPRESS_PORT}:${MONGO_EXPRESS_PORT}"
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/
       ME_CONFIG_BASICAUTH: false
     depends_on:
       - mongo
