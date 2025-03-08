@@ -15,9 +15,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.logging.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.net.ConnectException
 
 val client = HttpClient(CIO) {
     install(HttpTimeout) {
@@ -44,15 +42,13 @@ fun main() {
 
     queueConsumer.consume {
         runBlocking {
-            launch {
-                val resp = handleAuthRequest(it, authServerUrl)
-                persistService.persistLogin(it, resp)
-            }
+            val resp = handleAuthRequest(it, authServerUrl)
+            persistService.persistLogin(it, resp)
         }
     }
 }
 
-val logger = KtorSimpleLogger("test")
+val logger = KtorSimpleLogger("QueueConsumer")
 
 suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
     val resp = client.get(requestUrl)
@@ -63,14 +59,14 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHook
     }
     val hookResponse = AuthHookResponse(value.stationId, value.driverId, status)
     if(value.callbackUrl != null) {
-        logger.info("got response: $hookResponse, calling callback")
         try {
             client.post(value.callbackUrl) {
                 setBody(hookResponse)
                 contentType(ContentType.Application.Json) //what plugin am I missing to automatically set this?
             }
-        } catch (_: ClientRequestException) {}
-        catch (_: ConnectException) {}
+        } catch (e: Exception) { //what else to do?
+            logger.warn("Got exception $e while trying to call ${value.callbackUrl}", e)
+        }
     }
     return hookResponse
 }

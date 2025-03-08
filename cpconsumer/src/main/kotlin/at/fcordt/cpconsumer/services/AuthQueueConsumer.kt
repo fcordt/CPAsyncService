@@ -1,6 +1,7 @@
 package at.fcordt.cpconsumer.services
 
 import at.fcordt.cpconsumer.models.AuthRequest
+import io.ktor.util.logging.*
 import io.ktor.utils.io.core.*
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import kotlin.time.Duration.Companion.milliseconds
@@ -9,6 +10,8 @@ import kotlin.time.toJavaDuration
 interface AuthQueueConsumer : Closeable {
     fun consume(block : (AuthRequest) ->  (Unit))
 }
+
+val logger = KtorSimpleLogger("AuthQueueConsumerImpl")
 
 class AuthQueueConsumerImpl(kafkaBootstrapServers: String, kafkaTopic: String) : AuthQueueConsumer {
     private val kafkaConsumer = KafkaConsumer<String, AuthRequest>(mapOf(
@@ -28,10 +31,17 @@ class AuthQueueConsumerImpl(kafkaBootstrapServers: String, kafkaTopic: String) :
             while(true) {
                 val message = kafkaConsumer.poll(100.milliseconds.toJavaDuration())
                 if(message != null && !message.isEmpty) {
-                    for(record in message) {
-                        block.invoke(record.value())
+                    try {
+                        for (record in message) {
+                            block.invoke(record.value())
+                        }
+                    } catch(e: Throwable) {
+                        //logging and rethrowing - we don't commit the kafka queue if there's no connection to the backend
+                        logger.error("Error consuming auth request", e)
+                        throw e
                     }
                 }
+                kafkaConsumer.commitSync()
             }
     }
 
