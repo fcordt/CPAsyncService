@@ -5,35 +5,15 @@ import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.hsts.*
 import java.util.concurrent.TimeUnit
 
-
-/**
- * Application block for [HSTS] configuration.
- *
- * This file may be excluded in .openapi-generator-ignore,
- * and application-specific configuration can be applied in this function.
- *
- * See http://ktor.io/features/hsts.html
- */
-internal fun ApplicationHstsConfiguration(): HSTSConfig.() -> Unit {
+internal fun applicationHstsConfiguration(): HSTSConfig.() -> Unit {
     return {
         maxAgeInSeconds = TimeUnit.DAYS.toSeconds(365)
         includeSubDomains = true
         preload = false
-
-        // You may also apply any custom directives supported by specific user-agent. For example:
-        // customDirectives.put("redirectHttpToHttps", "false")
     }
 }
 
-/**
- * Application block for [Compression] configuration.
- *
- * This file may be excluded in .openapi-generator-ignore,
- * and application-specific configuration can be applied in this function.
- *
- * See http://ktor.io/features/compression.html
- */
-internal fun ApplicationCompressionConfiguration(): CompressionConfig.() -> Unit {
+internal fun applicationCompressionConfiguration(): CompressionConfig.() -> Unit {
     return {
         gzip {
             priority = 1.0

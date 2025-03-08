@@ -12,21 +12,21 @@ import io.ktor.server.routing.*
 import org.koin.ktor.ext.get
 import java.util.concurrent.TimeoutException
 
-fun Route.DefaultApi() {
+fun Route.defaultApi() {
     //oh boy, see https://github.com/InsertKoinIO/koin/issues/2008
     val authQueueProvider = application.get<AuthQueueProvider>()
 
-    post<Paths.chargingAuthRequestPost> {
+    post<Paths.ChargingAuthRequestPost> {
         val authRequest = call.receive<AuthRequest>()
         try {
             authQueueProvider.insertAuthRequest(authRequest)
             call.respond(HttpStatusCode.OK, AuthResponse(
-                AuthResponse.Status.accepted,
+                AuthResponse.Status.Accepted,
                 "Request is being processed asynchronously. The result will be sent to the provided callback URL."
             ))
         } catch (e: TimeoutException) {
             call.respond(HttpStatusCode.RequestTimeout, AuthResponse(
-                AuthResponse.Status.denied,
+                AuthResponse.Status.Denied,
                 "Timeout"
             ))
         }

@@ -16,9 +16,9 @@ data class AuthHookResponse(
     val status: Status? = null
 ) {
     enum class Status(val value: String){
-        allowed("allowed"),
-        notAllowed("not_allowed"),
-        unknown("unknown"),
-        invalid("invalid");
+        Allowed("allowed"),
+        NotAllowed("not_allowed"),
+        Unknown("unknown"),
+        Invalid("invalid");
     }
 }

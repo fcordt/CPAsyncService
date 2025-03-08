@@ -36,6 +36,7 @@ val persistService : LoginPersistService = LoginPersistServiceImpl(
     (System.getenv("MONGO_COLLECTION_NAME") ?: "LoginCollection"))
 
 
+@Suppress("HttpUrlsUsage")
 fun main() {
     var authServerUrl = (System.getenv("AUTH_SERVER_URL") ?: "localhost:8084") + "/api/v1/internal/auth"
     if(!authServerUrl.startsWith("http://") && !authServerUrl.startsWith("https://")) {
@@ -59,9 +60,9 @@ suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHook
     }
     logger.info("got response $resp")
     val status = when (resp.status) {
-        HttpStatusCode.OK -> resp.body<BackendAuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
-        HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.unknown
-        else -> AuthHookResponse.Status.invalid
+        HttpStatusCode.OK -> resp.body<BackendAuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.Invalid
+        HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.Unknown
+        else -> AuthHookResponse.Status.Invalid
     }
     val hookResponse = value.toAuthHookResponse(status)
     if(value.callbackUrl != null) {

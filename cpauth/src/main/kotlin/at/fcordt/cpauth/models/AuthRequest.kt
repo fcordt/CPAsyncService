@@ -1,16 +1,9 @@
 package at.fcordt.cpauth.models
 
-
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
 
-/**
- * 
- * @param stationId 
- * @param driverId 
- * @param callbackUrl This URL will be called when the authorization process is completed. No URL checking as per requirements.
- */
 @Serializable
 data class AuthRequest(
     @Serializable(with = UUIDSerializer::class)

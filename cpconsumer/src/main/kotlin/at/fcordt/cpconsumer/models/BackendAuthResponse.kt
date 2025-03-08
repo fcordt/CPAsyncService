@@ -2,22 +2,16 @@ package at.fcordt.cpconsumer.models
 
 
 import kotlinx.serialization.Serializable
-/**
- * 
- * @param status
- */
+
 @Serializable
 data class BackendAuthResponse(
     val status: Status? = null,
 )
 {
-    /**
-    * 
-    * Values: accepted,denied
-    */
+    @Suppress("unused")
     enum class Status(val value: String, private val authHookStatus: AuthHookResponse.Status){
-        accepted("accepted", AuthHookResponse.Status.allowed),
-        denied("denied", AuthHookResponse.Status.notAllowed);
+        Accepted("accepted", AuthHookResponse.Status.Allowed),
+        Denied("denied", AuthHookResponse.Status.NotAllowed);
 
         fun toAuthHookStatus() = authHookStatus
     }

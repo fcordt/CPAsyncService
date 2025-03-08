@@ -3,6 +3,7 @@ package at.fcordt.cpconsumer.models
 import kotlinx.serialization.json.Json
 import org.apache.kafka.common.serialization.Deserializer
 
+@Suppress("unused")
 class AuthRequestDeserializer : Deserializer<AuthRequest> {
     override fun deserialize(topic: String?, data: ByteArray?): AuthRequest {
         val dataString = data?.decodeToString() ?: ""
