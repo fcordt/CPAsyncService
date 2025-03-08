@@ -1,10 +1,10 @@
-val logback_version: String by project
-val kafka_version: String by project
-val ktor_version: String by project
-val kotlinx_version: String by project
-val mongo_version: String by project
-val datetime_version: String by project
-val serialization_version: String by project
+val logbackVersion: String by project
+val kafkaVersion: String by project
+val ktorVersion: String by project
+val kotlinxVersion: String by project
+val mongoVersion: String by project
+val datetimeVersion: String by project
+val serializationVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -25,19 +25,19 @@ repositories {
 }
 
 dependencies {
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("org.apache.kafka:kafka-clients:$kafka_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:$datetime_version")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongoVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:$datetimeVersion")
     //using kotlinx's datetime with mongodb: https://stackoverflow.com/questions/77851362/how-to-use-kotlinx-datetime-with-kotlin-mongodb-driver
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
-    implementation("org.mongodb:bson-kotlinx:$mongo_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+    implementation("org.mongodb:bson-kotlinx:$mongoVersion")
 }
 
 kotlin {

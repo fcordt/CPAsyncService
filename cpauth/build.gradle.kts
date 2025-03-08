@@ -1,7 +1,7 @@
-val logback_version: String by project
-val koin_version: String by project
-val ktor_version: String by project
-val kafka_version: String by project
+val logbackVersion: String by project
+val koinVersion: String by project
+val ktorVersion: String by project
+val kafkaVersion: String by project
 
 group = "at.fcordt"
 version = "1.0"
@@ -24,22 +24,22 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("io.ktor:ktor-bom:$ktor_version"))
-    implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-auth:$ktor_version")
-    implementation("io.ktor:ktor-server-auto-head-response:$ktor_version")
-    implementation("io.ktor:ktor-server-default-headers:$ktor_version")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("io.ktor:ktor-server-resources:$ktor_version")
-    implementation("io.ktor:ktor-server-hsts:$ktor_version")
-    implementation("io.ktor:ktor-server-compression:$ktor_version")
+    implementation(platform("io.ktor:ktor-bom:$ktorVersion"))
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-auto-head-response:$ktorVersion")
+    implementation("io.ktor:ktor-server-default-headers:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-server-resources:$ktorVersion")
+    implementation("io.ktor:ktor-server-hsts:$ktorVersion")
+    implementation("io.ktor:ktor-server-compression:$ktorVersion")
     implementation("io.dropwizard.metrics:metrics-core:4.1.18")
-    implementation("io.ktor:ktor-server-metrics:$ktor_version")
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("io.insert-koin:koin-ktor:$koin_version")
-    implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
-    implementation("org.apache.kafka:kafka-clients:$kafka_version")
+    implementation("io.ktor:ktor-server-metrics:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.insert-koin:koin-ktor:$koinVersion")
+    implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
+    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 }
 
 kotlin {
