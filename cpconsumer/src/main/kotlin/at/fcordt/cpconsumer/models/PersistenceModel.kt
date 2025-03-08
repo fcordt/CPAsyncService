@@ -1,18 +1,22 @@
 package at.fcordt.cpconsumer.models
 
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.codecs.pojo.annotations.BsonProperty
-import org.bson.types.ObjectId
 import kotlinx.datetime.Instant
-import java.util.UUID
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import org.bson.types.ObjectId
+import java.util.*
 
+@Serializable
 data class PersistenceModel(
-    @BsonId
+    @SerialName("_id")
+    @Contextual
     val id: ObjectId,
-    @BsonProperty("resquest_time")
+    @SerialName("request_time")
     val requestTime: Instant,
-    @BsonProperty("station_id")
+    @SerialName("station_id")
+    @Serializable(with = UUIDSerializer::class)
     val stationId: UUID?,
-    @BsonProperty("driver_id")
+    @SerialName("driver_id")
     val driverId: String?,
     val status: AuthHookResponse.Status?)

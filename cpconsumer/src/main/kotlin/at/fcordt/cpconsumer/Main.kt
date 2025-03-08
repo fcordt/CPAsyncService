@@ -52,6 +52,7 @@ val logger = KtorSimpleLogger("QueueConsumer")
 
 suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
     val resp = client.get(requestUrl)
+    logger.info("got response $resp")
     val status = when (resp.status) {
         HttpStatusCode.OK -> resp.body<AuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
         HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.unknown

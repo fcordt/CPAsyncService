@@ -4,6 +4,7 @@ val ktor_version: String by project
 val kotlinx_version: String by project
 val mongo_version: String by project
 val datetime_version: String by project
+val serialization_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -34,6 +35,9 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("org.mongodb:mongodb-driver-kotlin-coroutine:$mongo_version")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:$datetime_version")
+    //using kotlinx's datetime with mongodb: https://stackoverflow.com/questions/77851362/how-to-use-kotlinx-datetime-with-kotlin-mongodb-driver
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serialization_version")
+    implementation("org.mongodb:bson-kotlinx:$mongo_version")
 }
 
 kotlin {
