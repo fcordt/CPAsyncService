@@ -2,10 +2,12 @@ package at.fcordt.cpconsumer
 
 import at.fcordt.cpconsumer.models.AuthHookResponse
 import at.fcordt.cpconsumer.models.AuthRequest
-import at.fcordt.cpconsumer.models.AuthResponse
+import at.fcordt.cpconsumer.models.BackendAuthResponse
 import at.fcordt.cpconsumer.services.AuthQueueConsumerImpl
 import at.fcordt.cpconsumer.services.LoginPersistService
 import at.fcordt.cpconsumer.services.LoginPersistServiceImpl
+import at.fcordt.cpconsumer.services.ModelTransformers.toAuthHookResponse
+import at.fcordt.cpconsumer.services.ModelTransformers.toBackendAuthRequest
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -51,14 +53,17 @@ fun main() {
 val logger = KtorSimpleLogger("QueueConsumer")
 
 suspend fun handleAuthRequest(value: AuthRequest, requestUrl: String) : AuthHookResponse {
-    val resp = client.get(requestUrl)
+    val resp = client.post(requestUrl) {
+        setBody(value.toBackendAuthRequest())
+        contentType(ContentType.Application.Json)
+    }
     logger.info("got response $resp")
     val status = when (resp.status) {
-        HttpStatusCode.OK -> resp.body<AuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
+        HttpStatusCode.OK -> resp.body<BackendAuthResponse>().status?.toAuthHookStatus() ?: AuthHookResponse.Status.invalid
         HttpStatusCode.RequestTimeout -> AuthHookResponse.Status.unknown
         else -> AuthHookResponse.Status.invalid
     }
-    val hookResponse = AuthHookResponse(value.stationId, value.driverId, status)
+    val hookResponse = value.toAuthHookResponse(status)
     if(value.callbackUrl != null) {
         try {
             client.post(value.callbackUrl) {

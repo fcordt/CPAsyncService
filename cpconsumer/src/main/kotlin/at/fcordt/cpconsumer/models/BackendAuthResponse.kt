@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
  * @param status
  */
 @Serializable
-data class AuthResponse(
+data class BackendAuthResponse(
     val status: Status? = null,
 )
 {
